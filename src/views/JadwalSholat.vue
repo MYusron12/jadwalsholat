@@ -1,0 +1,147 @@
+<template>
+  <div class="container my-3">
+    <div class="">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-9 mb-3">
+            <input list="city-list" v-model="selectedCityLocation" @input="updateSelectedCity" class="form-control"
+              placeholder="Select or enter city name" />
+            <datalist id="city-list">
+              <option v-for="city in cities" :key="city.id" :value="city.lokasi">{{ city.lokasi }}</option>
+            </datalist>
+          </div>
+          <div class="col-md-3 mb-3">
+            <input v-model="selectedDateTime" @change="updateScheduleShalat" class="form-control" type="date">
+          </div>
+        </div>
+      </div>
+      <div class="card m-2">
+        <div class="card-body">
+          Shalat Harian
+          <br>
+          <pre>
+            {{ scheduleShalat }}
+          </pre>
+        </div>
+      </div>
+      <div class="card m-2">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-9"></div>
+            <div class="col-md-3 mb-3">
+              <input v-model="selectedDate" @change="updateScheduleShalatMonthly" class="form-control" type="month">
+            </div>
+          </div>
+          Shalat Bulanan
+          <br>
+          <pre>
+            {{ scheduleShalatMonthly }}
+          </pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import axios from "axios";
+
+export default {
+  name: 'JadwalSholat',
+  data() {
+    return {
+      cities: [],
+      selectedCity: '',
+      selectedCityLocation: '',
+      selectedDate: '',
+      selectedDateTime: '',
+      scheduleShalat: null,
+      scheduleShalatMonthly: null
+    }
+  },
+  methods: {
+    async fetchAllCityNames() {
+      try {
+        const response = await axios.get('https://api.myquran.com/v2/sholat/kota/semua');
+        this.cities = response.data.data;
+
+        // Set default city to 1301
+        const defaultCity = this.cities.find(city => city.id === '1301');
+        if (defaultCity) {
+          this.selectedCity = defaultCity.id;
+          this.selectedCityLocation = defaultCity.lokasi;
+        }
+
+        // Fetch initial schedules for default city
+        this.updateScheduleShalat();
+        this.updateScheduleShalatMonthly();
+      } catch (error) {
+        console.error('Error fetching all city names:', error);
+      }
+    },
+    async fetchScheduleShalat(kotaId, date) {
+      try {
+        const response = await axios.get(`https://api.myquran.com/v2/sholat/jadwal/${kotaId}/${date}`);
+        this.scheduleShalat = response.data.data;
+      } catch (error) {
+        console.error('Error fetching sholat schedule:', error);
+      }
+    },
+    async fetchScheduleShalatMonthly(kotaId, tahun, bulan) {
+      try {
+        const response = await axios.get(`https://api.myquran.com/v2/sholat/jadwal/${kotaId}/${tahun}/${bulan}`);
+        this.scheduleShalatMonthly = response.data.data;
+      } catch (error) {
+        console.error('Error fetching sholat schedule:', error);
+      }
+    },
+    updateSelectedCity() {
+      const selectedCity = this.cities.find(city => city.lokasi === this.selectedCityLocation);
+      if (selectedCity) {
+        this.selectedCity = selectedCity.id;
+        this.updateScheduleShalat();
+        this.updateScheduleShalatMonthly();
+      }
+    },
+    updateScheduleShalat() {
+      if (this.selectedCity && this.selectedDateTime) {
+        this.fetchScheduleShalat(this.selectedCity, this.selectedDateTime);
+      }
+    },
+    updateScheduleShalatMonthly() {
+      if (this.selectedCity && this.selectedDate) {
+        const [year, month] = this.selectedDate.split('-');
+        this.fetchScheduleShalatMonthly(this.selectedCity, year, month);
+      }
+    }
+  },
+  mounted() {
+    this.fetchAllCityNames();
+
+    // Set default dates to today
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const day = String(currentDate.getDate()).padStart(2, '0');
+    this.selectedDateTime = `${year}-${month}-${day}`;
+    this.selectedDate = `${year}-${month}`;
+  }
+}
+</script>
+
+<style scoped>
+.card-container {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
+.card {
+  margin-right: 1rem;
+}
+
+.list-group-item {
+  border: none;
+  padding: 0.5rem 0;
+}
+</style>
