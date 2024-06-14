@@ -15,24 +15,71 @@
           </div>
         </div>
       </div>
-      <div class="card m-2">
-        <div class="card-body">
-          Shalat Harian
-          <br>
-          <pre>
-            {{ scheduleShalat }}
-          </pre>
+      <div class="card m-2" v-if="scheduleShalat">
+        <div class="card-body d-flex flex-wrap justify-content-center">
+          <div class="card border-primary mb-3" style="max-width: 18rem;">
+            <div class="card-body text-primary text-center">
+              <h5 class="card-title">Imsak</h5>
+              <p class="card-text">{{ scheduleShalat.jadwal.imsak }}</p>
+            </div>
+          </div>
+          <div class="card border-secondary mb-3" style="max-width: 18rem;">
+            <div class="card-body text-secondary text-center">
+              <h5 class="card-title">Subuh</h5>
+              <p class="card-text">{{ scheduleShalat.jadwal.subuh }}</p>
+            </div>
+          </div>
+          <div class="card border-success mb-3" style="max-width: 18rem;">
+            <div class="card-body text-success text-center">
+              <h5 class="card-title">Dzuhur</h5>
+              <p class="card-text">{{ scheduleShalat.jadwal.dzuhur }}</p>
+            </div>
+          </div>
+          <div class="card border-danger mb-3" style="max-width: 18rem;">
+            <div class="card-body text-danger text-center">
+              <h5 class="card-title">Ashar</h5>
+              <p class="card-text">{{ scheduleShalat.jadwal.ashar }}</p>
+            </div>
+          </div>
+          <div class="card border-warning mb-3" style="max-width: 18rem;">
+            <div class="card-body text-warning text-center">
+              <h5 class="card-title">Maghrib</h5>
+              <p class="card-text">{{ scheduleShalat.jadwal.maghrib }}</p>
+            </div>
+          </div>
+          <div class="card border-info mb-3" style="max-width: 18rem;">
+            <div class="card-body text-info text-center">
+              <h5 class="card-title">Isya</h5>
+              <p class="card-text">{{ scheduleShalat.jadwal.isya }}</p>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="card m-2">
+      <div class="card" v-if="scheduleShalatMonthly">
         <div class="card-body">
           <div class="row">
-            <div class="col-md-9"></div>
-            <div class="col-md-3 mb-3">
+            <!-- <div class="col-md-9"></div> -->
+            <div class="col-md m-2">
               <input v-model="selectedDate" @change="updateScheduleShalatMonthly" class="form-control" type="month">
             </div>
           </div>
-          Shalat Bulanan
+          <div class="card-container d-flex flex-wrap justify-content-center">
+            <div v-for="(jadwal, index) in scheduleShalatMonthly.jadwal" :key="index" class="card m-2">
+              <div class="card-body text-center">
+                <h5 class="card-title">{{ jadwal.tanggal }}</h5>
+                <div class="border-top m-2 pt-2">
+                  <p class="card-text"><strong>Imsak:</strong> {{ jadwal.imsak }}</p>
+                  <p class="card-text"><strong>Subuh:</strong> {{ jadwal.subuh }}</p>
+                  <p class="card-text"><strong>Terbit:</strong> {{ jadwal.terbit }}</p>
+                  <p class="card-text"><strong>Dhuha:</strong> {{ jadwal.dhuha }}</p>
+                  <p class="card-text"><strong>Dzuhur:</strong> {{ jadwal.dzuhur }}</p>
+                  <p class="card-text"><strong>Ashar:</strong> {{ jadwal.ashar }}</p>
+                  <p class="card-text"><strong>Maghrib:</strong> {{ jadwal.maghrib }}</p>
+                  <p class="card-text"><strong>Isya:</strong> {{ jadwal.isya }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
           <br>
           <pre>
             {{ scheduleShalatMonthly }}
