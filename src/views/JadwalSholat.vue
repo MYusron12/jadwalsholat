@@ -1,7 +1,16 @@
 <template>
   <div class="container my-3">
+    <div class="map-wrap" style="display:none">
+      <a href="https://www.maptiler.com" class="watermark">
+        <img src="https://api.maptiler.com/resources/logo.svg" alt="MapTiler logo" />
+      </a>
+      <div class="map" ref="mapContainer"></div>
+    </div>
+    <div v-if="currentTime" class="text-center mb-3">
+      <h2>{{ currentTime }}</h2>
+    </div>
     <div class="">
-      <div class="card-body">
+      <div class="">
         <div class="row">
           <div class="col-md-9 mb-3">
             <input list="city-list" v-model="selectedCityLocation" @input="updateSelectedCity" class="form-control"
@@ -15,41 +24,59 @@
           </div>
         </div>
       </div>
-      <div class="card m-2" v-if="scheduleShalat">
+      <div class="m-2" v-if="scheduleShalat">
         <div class="card-body d-flex flex-wrap justify-content-center">
-          <div class="card border-primary mb-3" style="max-width: 18rem;">
+          <div class="border-primary m-3" style="max-width: 18rem;">
             <div class="card-body text-primary text-center">
-              <h5 class="card-title">Imsak</h5>
+              <h5 class="card-title">
+                <font-awesome-icon icon="hourglass-start" />
+                Imsak
+              </h5>
               <p class="card-text">{{ scheduleShalat.jadwal.imsak }}</p>
             </div>
           </div>
-          <div class="card border-secondary mb-3" style="max-width: 18rem;">
+          <div class="border-secondary m-3" style="max-width: 18rem;">
             <div class="card-body text-secondary text-center">
-              <h5 class="card-title">Subuh</h5>
+              <h5 class="card-title">
+                <font-awesome-icon icon="cloud-sun" />
+                Subuh
+              </h5>
               <p class="card-text">{{ scheduleShalat.jadwal.subuh }}</p>
             </div>
           </div>
-          <div class="card border-success mb-3" style="max-width: 18rem;">
+          <div class="border-success m-3" style="max-width: 18rem;">
             <div class="card-body text-success text-center">
-              <h5 class="card-title">Dzuhur</h5>
+              <h5 class="card-title">
+                <font-awesome-icon icon="sun" />
+                Dzuhur
+              </h5>
               <p class="card-text">{{ scheduleShalat.jadwal.dzuhur }}</p>
             </div>
           </div>
-          <div class="card border-danger mb-3" style="max-width: 18rem;">
+          <div class="border-danger m-3" style="max-width: 18rem;">
             <div class="card-body text-danger text-center">
-              <h5 class="card-title">Ashar</h5>
+              <h5 class="card-title">
+                <font-awesome-icon icon="person-praying" />
+                Ashar
+              </h5>
               <p class="card-text">{{ scheduleShalat.jadwal.ashar }}</p>
             </div>
           </div>
-          <div class="card border-warning mb-3" style="max-width: 18rem;">
+          <div class="border-warning m-3" style="max-width: 18rem;">
             <div class="card-body text-warning text-center">
-              <h5 class="card-title">Maghrib</h5>
+              <h5 class="card-title">
+                <font-awesome-icon icon="cloud-moon" />
+                Maghrib
+              </h5>
               <p class="card-text">{{ scheduleShalat.jadwal.maghrib }}</p>
             </div>
           </div>
-          <div class="card border-info mb-3" style="max-width: 18rem;">
+          <div class="border-info m-3" style="max-width: 18rem;">
             <div class="card-body text-info text-center">
-              <h5 class="card-title">Isya</h5>
+              <h5 class="card-title">
+                <font-awesome-icon icon="moon" />
+                Isya
+              </h5>
               <p class="card-text">{{ scheduleShalat.jadwal.isya }}</p>
             </div>
           </div>
@@ -58,32 +85,40 @@
       <div class="card" v-if="scheduleShalatMonthly">
         <div class="card-body">
           <div class="row">
-            <!-- <div class="col-md-9"></div> -->
             <div class="col-md m-2">
               <input v-model="selectedDate" @change="updateScheduleShalatMonthly" class="form-control" type="month">
             </div>
           </div>
-          <div class="card-container d-flex flex-wrap justify-content-center">
-            <div v-for="(jadwal, index) in scheduleShalatMonthly.jadwal" :key="index" class="card m-2">
-              <div class="card-body text-center">
-                <h5 class="card-title">{{ jadwal.tanggal }}</h5>
-                <div class="border-top m-2 pt-2">
-                  <p class="card-text"><strong>Imsak:</strong> {{ jadwal.imsak }}</p>
-                  <p class="card-text"><strong>Subuh:</strong> {{ jadwal.subuh }}</p>
-                  <p class="card-text"><strong>Terbit:</strong> {{ jadwal.terbit }}</p>
-                  <p class="card-text"><strong>Dhuha:</strong> {{ jadwal.dhuha }}</p>
-                  <p class="card-text"><strong>Dzuhur:</strong> {{ jadwal.dzuhur }}</p>
-                  <p class="card-text"><strong>Ashar:</strong> {{ jadwal.ashar }}</p>
-                  <p class="card-text"><strong>Maghrib:</strong> {{ jadwal.maghrib }}</p>
-                  <p class="card-text"><strong>Isya:</strong> {{ jadwal.isya }}</p>
-                </div>
-              </div>
-            </div>
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Imsak</th>
+                  <th>Subuh</th>
+                  <th>Terbit</th>
+                  <th>Dhuha</th>
+                  <th>Dzuhur</th>
+                  <th>Ashar</th>
+                  <th>Maghrib</th>
+                  <th>Isya</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(jadwal, index) in scheduleShalatMonthly.jadwal" :key="index">
+                  <td>{{ jadwal.tanggal }}</td>
+                  <td>{{ jadwal.imsak }}</td>
+                  <td>{{ jadwal.subuh }}</td>
+                  <td>{{ jadwal.terbit }}</td>
+                  <td>{{ jadwal.dhuha }}</td>
+                  <td>{{ jadwal.dzuhur }}</td>
+                  <td>{{ jadwal.ashar }}</td>
+                  <td>{{ jadwal.maghrib }}</td>
+                  <td>{{ jadwal.isya }}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <br>
-          <pre>
-            {{ scheduleShalatMonthly }}
-          </pre>
         </div>
       </div>
     </div>
@@ -92,8 +127,19 @@
 
 <script>
 import axios from "axios";
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faHourglassStart, faCloudSun, faSun, faPersonPraying, faCloudMoon, faMoon } from '@fortawesome/free-solid-svg-icons';
+
+import { Map, NavigationControl, Marker } from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
+
+library.add(faHourglassStart, faCloudSun, faSun, faPersonPraying, faCloudMoon, faMoon);
 
 export default {
+  components: {
+    FontAwesomeIcon,
+  },
   name: 'JadwalSholat',
   data() {
     return {
@@ -103,7 +149,18 @@ export default {
       selectedDate: '',
       selectedDateTime: '',
       scheduleShalat: null,
-      scheduleShalatMonthly: null
+      scheduleShalatMonthly: null,
+      currentTime: '',
+      currentLocation: '',
+      map: null,
+      latitude: null,
+      longitude: null,
+      zoom: 14
+    }
+  },
+  beforeUnmount() {
+    if (this.map) {
+      this.map.remove();
     }
   },
   methods: {
@@ -160,7 +217,13 @@ export default {
         const [year, month] = this.selectedDate.split('-');
         this.fetchScheduleShalatMonthly(this.selectedCity, year, month);
       }
-    }
+    },
+    updateCurrentTime() {
+      setInterval(() => {
+        const now = new Date();
+        this.currentTime = now.toLocaleTimeString();
+      }, 1000);
+    },
   },
   mounted() {
     this.fetchAllCityNames();
@@ -172,23 +235,66 @@ export default {
     const day = String(currentDate.getDate()).padStart(2, '0');
     this.selectedDateTime = `${year}-${month}-${day}`;
     this.selectedDate = `${year}-${month}`;
+
+    // Start the clock
+    this.updateCurrentTime();
+
+    const initialState = { lng: 139.753, lat: 35.6844, zoom: 14 };
+
+    this.map = new Map({
+      container: this.$refs.mapContainer,
+      style: `https://api.maptiler.com/maps/streets/style.json?key=Y0N0Nz2zGqEhg5yMoYPP`,
+      // center: [initialState.lng, initialState.lat],
+      center: [this.longitude, this.latitude],
+      zoom: this.zoom
+    });
+    this.map.addControl(new NavigationControl(), 'top-right');
+    new Marker({ color: "#FF0000" })
+      // .setLngLat([139.7525, 35.6841])
+      .setLngLat([this.longitude, this.latitude])
+      .addTo(this.map);
+
+    if (navigator.geolocation) {
+      navigator.geolocation.watchPosition(
+        position => {
+          this.latitude = position.coords.latitude;
+          this.longitude = position.coords.longitude;
+        },
+        error => {
+          console.error('Error getting geolocation:', error);
+        }
+      );
+    } else {
+      console.error('Geolocation is not supported by this browser.');
+    }
   }
 }
 </script>
 
 <style scoped>
-.card-container {
-  display: flex;
-  flex-wrap: nowrap;
-  overflow-x: auto;
+.map-wrap {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 77px);
+  /* calculate height of the screen minus the heading */
 }
 
-.card {
-  margin-right: 1rem;
+.map {
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 
-.list-group-item {
-  border: none;
-  padding: 0.5rem 0;
+.watermark {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  z-index: 999;
+}
+
+.table-danger {
+  background-color: #f8d7da;
+  /* Warna merah */
 }
 </style>
+
