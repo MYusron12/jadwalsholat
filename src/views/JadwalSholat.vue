@@ -7,7 +7,10 @@
       <div class="map" ref="mapContainer"></div>
     </div>
     <div v-if="currentTime" class="text-center mb-3">
-      <h2>{{ currentTime }}</h2>
+      <h2>
+        {{ currentTime }}
+        <font-awesome-icon icon="hourglass" class="slow-spin" />
+      </h2>
     </div>
     <div class="">
       <div class="">
@@ -221,7 +224,12 @@ export default {
     updateCurrentTime() {
       setInterval(() => {
         const now = new Date();
-        this.currentTime = now.toLocaleTimeString();
+        this.currentTime = now.toLocaleTimeString('id-ID', {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false
+        }).replace(/\./g, ':');
       }, 1000);
     },
   },
@@ -296,5 +304,19 @@ export default {
   background-color: #f8d7da;
   /* Warna merah */
 }
-</style>
 
+/* Kustom CSS untuk menyesuaikan kecepatan animasi */
+.slow-spin {
+  animation: fa-spin 4s infinite linear;
+}
+
+@keyframes fa-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+</style>
